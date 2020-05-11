@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>hflex6</title>
+    <style>
+    body {margin: 0;}
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+
+<script>
+
+fetch('hflex6.json').then(data => data.json()).then(json => {
+    var canvas = document.getElementsByTagName('canvas')[0]
+    var ctx
+
+    var conv = (e) => e.match(/^[0-9.]+$/) ? +e : e
+
+    json.forEach(c => {
+        var {Name, Args} = c
+        if (Name == "Init") {
+            var [width,height] = Args
+            canvas.width = width
+            canvas.height = height
+            ctx = canvas.getContext('2d')
+        } else if (Name == "DrawText") {
+            var [left, top, width, height, color, font, size, style, weight, text] = Args.map(conv)
+            var x = left
+            var y = top + height * (16/19)
+            ctx.fillStyle = color
+            ctx.font = `${size * 1.35}px ${font}`
+            ctx.fillText(text, x, y)
+        } else if (Name == "DrawRectangle") {
+            var [style, color, width, left, top, width, height] = Args.map(conv)
+            ctx.strokeStyle = color
+            ctx.moveTo(left, top)
+            ctx.lineTo(left + width, top)
+            ctx.lineTo(left + width, top + height)
+            ctx.lineTo(left, top + height)
+            ctx.lineTo(left, top)
+            ctx.stroke()
+        } else {
+            console.log(`${Name} not implemented`)
+        }
+    })
+})
+
+</script>
+</body>
+</html>
